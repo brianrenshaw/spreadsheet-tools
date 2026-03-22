@@ -2,7 +2,7 @@
 
 A web-based version of [Spreadsheet Scripts](https://github.com/brianrenshaw/spreadsheet-scripts) — quick access to common spreadsheet operations without installing Python or running scripts. Just open the page, drop your files, and go.
 
-**Live at:** https://brianrenshaw.github.io/spreadsheet-webapp
+**Live at:** https://brianrenshaw.github.io/spreadsheet-tools/
 
 ## What's Included
 
