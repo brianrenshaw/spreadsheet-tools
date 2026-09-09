@@ -1,148 +1,132 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ErrorBoundary from './components/ErrorBoundary'
 import FileDropZone from './components/FileDropZone'
 import OperationMenu from './components/OperationMenu'
 import OperationForm from './components/OperationForm'
 import ResultPanel from './components/ResultPanel'
-
-const TOOL_DESCRIPTIONS = [
-  { name: 'Merge', desc: 'Combine multiple files into one. Keeps the header from the first file and appends all rows from the rest.' },
-  { name: 'Convert Format', desc: 'Switch between CSV and XLSX. CSV files become XLSX, Excel files become CSV.' },
-  { name: 'Deduplicate', desc: 'Remove duplicate rows. Deduplicate by all columns, or choose specific columns as a composite key.' },
-  { name: 'Filter Columns', desc: 'Keep only the columns you need. Pick from a list of detected column names.' },
-  { name: 'Compare', desc: 'See what changed between two files. Produces a color-coded diff: green (added), red (removed), yellow (changed).' },
-  { name: 'Trim & Clean', desc: 'Strip whitespace from cells and headers. Normalizes placeholders like NA, N/A, null, and none to empty cells.' },
-  { name: 'Remove Empty', desc: 'Drop rows and columns that are entirely blank. Great for cleaning up messy exports.' },
-]
+import { TOOLS, fileRequirementError } from './lib/tools'
 
 function App() {
   const [files, setFiles] = useState([])
   const [selectedOp, setSelectedOp] = useState(null)
   const [result, setResult] = useState(null)
-  const [showGuide, setShowGuide] = useState(false)
+  const [fileRevision, setFileRevision] = useState(0)
+  const [busy, setBusy] = useState(false)
+  const workspaceHeading = useRef(null)
+  const menuHeading = useRef(null)
+  const tool = TOOLS.find((item) => item.id === selectedOp)
+  const fileError = fileRequirementError(tool, files.length)
 
-  const handleResult = (data) => {
-    setResult(data)
+  useEffect(() => {
+    if (selectedOp) workspaceHeading.current?.focus()
+  }, [selectedOp])
+
+  const changeFiles = (next) => {
+    setFiles(next)
+    setFileRevision((revision) => revision + 1)
+    setResult(null)
   }
 
-  const handleReset = () => {
-    setFiles([])
-    setSelectedOp(null)
+  const selectTool = (id) => {
+    if (busy) return
+    setSelectedOp(id)
     setResult(null)
+    if (id === selectedOp) workspaceHeading.current?.focus()
+  }
+
+  const reset = () => {
+    if (busy) return
+    changeFiles([])
+    setSelectedOp(null)
+    menuHeading.current?.focus()
   }
 
   return (
     <ErrorBoundary>
-    <div className="tools-app min-h-screen bg-gray-50">
-      <a className="skip-link" href="#workspace">Skip to tools</a><header className="tools-nav"><a href="https://brianrenshaw.app/">← Brian’s homepage</a><a href="https://github.com/brianrenshaw/spreadsheet-scripts">Get the scripts ↗</a></header><main className="tools-main">
-        {/* Header */}
-        <div className="tools-intro">
-          <p className="tools-eyebrow">SPREADSHEET TOOLS · BY BRIAN RENSHAW</p><h1>A little less<br />spreadsheet busywork.</h1>
-          <p className="tools-lead">
-            Merge, tidy, compare, and convert. Small tools for getting your files into shape.
-          </p>
-          <div className="privacy-note">
-            <svg className="h-4 w-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            <p className="text-sm">
-              Your files stay yours. All processing happens in your browser. No accounts or uploads.
-            </p>
+      <div className="tools-app">
+        <a className="skip-link" href="#tools">Skip to tools</a>
+        <header className="tools-nav">
+          <a href="https://brianrenshaw.app/">← Brian’s homepage</a>
+          <a href="https://github.com/brianrenshaw/spreadsheet-scripts">Get the scripts ↗</a>
+        </header>
+        <main className="tools-main">
+          <div className="tools-intro">
+            <p className="tools-eyebrow">SPREADSHEET TOOLS · BY BRIAN RENSHAW</p>
+            <h1>Make everyday spreadsheet tasks easier.</h1>
+            <p className="tools-lead">Combine files, remove duplicates, compare spreadsheets, and convert formats.</p>
+            <p className="privacy-note">No installation or account needed. Your files stay in your browser.</p>
+            <ol className="task-steps" aria-label="How it works">
+              <li><span>1</span> Choose a tool</li>
+              <li><span>2</span> Add your files</li>
+              <li><span>3</span> Download the result</li>
+            </ol>
           </div>
 
-          {/* Guide toggle */}
-          <button
-            aria-expanded={showGuide}
-            aria-controls="tool-guide"
-            onClick={() => setShowGuide(!showGuide)}
-            className="mt-3 text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
-          >
-            <svg className={`h-4 w-4 transition-transform ${showGuide ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            {showGuide ? 'Hide' : 'What can this do?'}
-          </button>
-
-          {showGuide && (
-            <div id="tool-guide" className="mt-3 bg-white border border-gray-200 rounded-xl p-5 space-y-3">
-              {TOOL_DESCRIPTIONS.map((tool) => (
-                <div key={tool.name}>
-                  <p className="text-sm font-semibold text-gray-900">{tool.name}</p>
-                  <p className="text-sm text-gray-500">{tool.desc}</p>
-                </div>
-              ))}
+          <section id="tools" aria-labelledby="tools-title" tabIndex={-1}>
+            <div className="section-heading">
+              <h2 id="tools-title" ref={menuHeading} tabIndex={-1}>What do you need to do?</h2>
+              <p>Choose a tool to get started.</p>
             </div>
-          )}
-        </div>
-
-        <div className="workspace space-y-6" id="workspace" tabIndex={-1}>
-          {/* Step 1: Upload files */}
-          <section>
-            <StepHeader number="1" title="Choose your files" />
-            <FileDropZone files={files} setFiles={(next) => { setFiles(next); setSelectedOp(null); setResult(null) }} />
+            <OperationMenu selected={selectedOp} onSelect={selectTool} disabled={busy} />
           </section>
 
-          {/* Step 2: Choose operation */}
-          {files.length > 0 && (
-            <section>
-              <StepHeader number="2" title="Choose a tool" />
-              <OperationMenu
-                selected={selectedOp}
-                onSelect={(op) => { setSelectedOp(op); setResult(null) }}
-                fileCount={files.length}
-              />
-            </section>
-          )}
-
-          {/* Step 3: Configure & run */}
-          {selectedOp && (
-            <section>
-              <StepHeader number="3" title="Make it yours" />
-              <OperationForm
-                key={selectedOp}
-                operation={selectedOp}
-                files={files}
-                onResult={handleResult}
-              />
-            </section>
-          )}
-
-          {/* Result */}
-          {result && (
-            <section>
-              <ResultPanel result={result} operation={selectedOp} />
-            </section>
-          )}
-
-          {/* Reset */}
-          {files.length > 0 && (
-            <div className="text-center pt-2">
-              <button
-                onClick={handleReset}
-                className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                Start over
-              </button>
-            </div>
-          )}
-        </div>
-
-        <footer className="tools-footer"><span>Spreadsheet Tools · Brian Renshaw</span><a href="mailto:contact@brianrenshaw.app">Contact</a><a href="https://github.com/brianrenshaw/spreadsheet-tools">Source on GitHub ↗</a></footer>
-      </main>
-    </div>
+          <section id="task-workspace" className={`workspace ${tool ? '' : 'workspace-empty'}`} aria-labelledby="workspace-title" aria-busy={busy}>
+            {tool ? (
+              <>
+                <div className="workspace-heading">
+                  <div>
+                    <p className="tools-eyebrow">YOUR SELECTED TOOL</p>
+                    <h2 id="workspace-title" ref={workspaceHeading} tabIndex={-1}>{tool.name}</h2>
+                  </div>
+                  <button type="button" className="text-action" disabled={busy} onClick={() => menuHeading.current?.focus()}>Choose a different tool ↑</button>
+                </div>
+                <p className="workspace-hint">{tool.hint}</p>
+                <div className="workspace-columns">
+                  <section aria-labelledby="files-title">
+                    <StepHeader id="files-title" number="2" title="Add your files" />
+                    <p className="file-requirement">{tool.requirement} · CSV, XLSX, or XLS</p>
+                    <FileDropZone files={files} setFiles={changeFiles} disabled={busy} onBusyChange={setBusy} />
+                    <p className="file-note">Excel files use the first worksheet. Downloads contain data values, without the original workbook’s formatting.</p>
+                  </section>
+                  <section aria-labelledby="download-title">
+                    <StepHeader id="download-title" number="3" title="Download the result" />
+                    {fileError ? (
+                      <p className="next-step" role="status">{fileError}</p>
+                    ) : (
+                      <OperationForm
+                        key={`${selectedOp}-${fileRevision}`}
+                        operation={selectedOp}
+                        files={files}
+                        onResult={setResult}
+                        onBusyChange={setBusy}
+                        busy={busy}
+                      />
+                    )}
+                    {result && <div className="result"><ResultPanel result={result} operation={selectedOp} /></div>}
+                  </section>
+                </div>
+                <div className="workspace-footer">
+                  <p>Your original files stay unchanged.</p>
+                  <button type="button" className="text-action" disabled={busy} onClick={reset}>Start over</button>
+                </div>
+              </>
+            ) : (
+              <><h2 id="workspace-title">Your next step starts with a tool.</h2><p>Choose one above, then add the files you want to work with.</p></>
+            )}
+          </section>
+          <footer className="tools-footer">
+            <span>Spreadsheet Tools · Brian Renshaw</span>
+            <a href="mailto:contact@brianrenshaw.app">Contact</a>
+            <a href="https://github.com/brianrenshaw/spreadsheet-tools">Source on GitHub ↗</a>
+          </footer>
+        </main>
+      </div>
     </ErrorBoundary>
   )
 }
 
-function StepHeader({ number, title }) {
-  return (
-    <div className="flex items-center gap-2 mb-3">
-      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-900 text-white text-xs font-bold">
-        {number}
-      </span>
-      <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">{title}</h2>
-    </div>
-  )
+function StepHeader({ id, number, title }) {
+  return <h3 className="step-heading" id={id}><span>{number}</span>{title}</h3>
 }
 
 export default App

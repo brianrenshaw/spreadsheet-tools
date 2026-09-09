@@ -7,9 +7,10 @@ export default function ResultPanel({ result, operation }) {
         <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
-        <h3 className="font-semibold text-green-800">Done — file downloaded!</h3>
+        <h3 className="font-semibold text-green-800">Your result is ready.</h3>
       </div>
 
+      <p className="text-sm text-green-700">Your download starts automatically.</p>
       <div className="text-sm text-green-700 space-y-1">
         <ResultSummary result={result} operation={operation} />
       </div>

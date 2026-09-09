@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node scripts/smoke.mjs"
+    "test": "node scripts/smoke.mjs && node scripts/ui.mjs"
   },
   "dependencies": {
     "exceljs": "^4.4.0",
@@ -27,6 +27,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "jsdom": "^26.1.0",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.1"
   }

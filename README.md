@@ -1,6 +1,8 @@
 # Spreadsheet Tools
 
-A web-based version of [Spreadsheet Scripts](https://github.com/brianrenshaw/spreadsheet-scripts) — quick access to common spreadsheet operations without installing Python or running scripts. Just open the page, drop your files, and go.
+Make everyday spreadsheet tasks easier. Combine files, remove duplicates, compare spreadsheets, and convert formats without installation or an account.
+
+Read [MESSAGING.md](MESSAGING.md) before changing product copy and [WEBSITE_MIGRATION.md](WEBSITE_MIGRATION.md) before publishing.
 
 **Live at:** https://brianrenshaw.app/spreadsheet-tools/
 
@@ -18,8 +20,8 @@ A web-based version of [Spreadsheet Scripts](https://github.com/brianrenshaw/spr
 
 ## How It Works
 
-1. Drop your spreadsheet files onto the page (CSV or XLSX)
-2. Pick an operation
+1. Choose from the seven visible tools
+2. Add your spreadsheet files (CSV, XLSX, or XLS)
 3. Configure any options (output format, columns, etc.)
 4. Download the result
 
@@ -27,11 +29,11 @@ All processing happens in your browser. Your files never leave your machine.
 
 ## Built With
 
-- **React** + **Vite** — frontend UI
-- **Tailwind CSS** — styling
-- **ExcelJS** / **SheetJS** — spreadsheet processing in the browser
-- **GitHub Pages** — hosting
-- **GitHub Actions** — automated deployment on push
+- **React** + **Vite**: frontend UI
+- **Tailwind CSS**: styling
+- **ExcelJS** / **SheetJS**: spreadsheet processing in the browser
+- **GitHub Pages**: hosting
+- **GitHub Actions**: automated deployment on push
 
 ## Author
 

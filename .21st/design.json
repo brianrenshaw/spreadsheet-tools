@@ -34,6 +34,10 @@
     {
       "id": "folio-inspired-tools",
       "decision": "Warm cream, orange, and system typography from Folio; keep tools below apps on portfolio."
+    },
+    {
+      "id": "visible-task-catalog",
+      "decision": "Show seven task cards before files. Tool selection opens a responsive workspace. Preserve files and selection, and explain file requirements where needed."
     }
   ],
   "evidence": [],

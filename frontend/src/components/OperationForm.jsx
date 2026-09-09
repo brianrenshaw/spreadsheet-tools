@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import * as ops from '../lib/operations'
+import { TOOLS, fileRequirementError } from '../lib/tools'
 
-export default function OperationForm({ operation, files, onResult }) {
+export default function OperationForm({ operation, files, onResult, onBusyChange, busy }) {
   const [format, setFormat] = useState('xlsx')
   const [selectedColumns, setSelectedColumns] = useState([])
   const [keyColumn, setKeyColumn] = useState('')
@@ -9,6 +10,7 @@ export default function OperationForm({ operation, files, onResult }) {
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
 
+  const tool = TOOLS.find((item) => item.id === operation)
   const allColumns = files.length > 0 ? files[0].columns : []
 
   const toggleColumn = (col) => {
@@ -18,7 +20,9 @@ export default function OperationForm({ operation, files, onResult }) {
   }
 
   const handleSubmit = async () => {
+    if (!canSubmit()) return
     setProcessing(true)
+    onBusyChange(true)
     setError(null)
 
     const rawFiles = files.map(f => f.file)
@@ -57,28 +61,30 @@ export default function OperationForm({ operation, files, onResult }) {
       setError(err.message)
     } finally {
       setProcessing(false)
+      onBusyChange(false)
     }
   }
 
   const canSubmit = () => {
-    if (processing) return false
+    if (processing || busy || fileRequirementError(tool, files.length)) return false
     if (operation === 'filter' && selectedColumns.length === 0) return false
     if (operation === 'dedup' && dedupMode === 'selected' && selectedColumns.length === 0) return false
     return true
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-      <h3 className="font-semibold text-gray-900">Options</h3>
+    <fieldset disabled={processing || busy} className="operation-options bg-white border border-gray-200 rounded-xl p-5 space-y-4">
+      <legend className="sr-only">Download options</legend>
 
       {/* Format selector */}
       {!['convert', 'compare'].includes(operation) && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Output Format</label>
+          <p className="block text-sm font-medium text-gray-700 mb-1">Download format</p>
           <div className="flex gap-2">
             {['xlsx', 'csv'].map(f => (
               <button
                 key={f}
+                aria-pressed={format === f}
                 onClick={() => setFormat(f)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                   format === f
@@ -96,9 +102,10 @@ export default function OperationForm({ operation, files, onResult }) {
       {/* Dedup mode */}
       {operation === 'dedup' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Deduplicate By</label>
+          <p className="block text-sm font-medium text-gray-700 mb-1">Find duplicates using</p>
           <div className="flex gap-2 mb-2">
             <button
+              aria-pressed={dedupMode === 'all'}
               onClick={() => setDedupMode('all')}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                 dedupMode === 'all'
@@ -106,9 +113,10 @@ export default function OperationForm({ operation, files, onResult }) {
                   : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
               }`}
             >
-              All Columns
+              All columns
             </button>
             <button
+              aria-pressed={dedupMode === 'selected'}
               onClick={() => setDedupMode('selected')}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                 dedupMode === 'selected'
@@ -116,7 +124,7 @@ export default function OperationForm({ operation, files, onResult }) {
                   : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
               }`}
             >
-              Specific Columns
+              Selected columns
             </button>
           </div>
           {dedupMode === 'selected' && (
@@ -128,7 +136,7 @@ export default function OperationForm({ operation, files, onResult }) {
       {/* Filter columns */}
       {operation === 'filter' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Columns to Keep</label>
+          <p className="block text-sm font-medium text-gray-700 mb-1">Columns to keep</p>
           <ColumnPicker columns={allColumns} selected={selectedColumns} onToggle={toggleColumn} />
         </div>
       )}
@@ -136,8 +144,9 @@ export default function OperationForm({ operation, files, onResult }) {
       {/* Compare key column */}
       {operation === 'compare' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Match By</label>
+          <label htmlFor="match-column" className="block text-sm font-medium text-gray-700 mb-1">Match rows by</label>
           <select
+            id="match-column"
             value={keyColumn}
             onChange={(e) => setKeyColumn(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
@@ -151,7 +160,7 @@ export default function OperationForm({ operation, files, onResult }) {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
           {error}
         </div>
       )}
@@ -176,10 +185,10 @@ export default function OperationForm({ operation, files, onResult }) {
             Processing...
           </span>
         ) : (
-          'Run'
+          tool.action
         )}
       </button>
-    </div>
+    </fieldset>
   )
 }
 
@@ -192,6 +201,7 @@ function ColumnPicker({ columns, selected, onToggle }) {
       {columns.map(col => (
         <button
           key={col}
+          aria-pressed={selected.includes(col)}
           onClick={() => onToggle(col)}
           className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
             selected.includes(col)

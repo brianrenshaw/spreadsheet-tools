@@ -10,3 +10,5 @@ For website updates, edit `spreadsheet-webapp/frontend`, run `npm ci` and `npm r
 Design follows Folio: warm cream, orange, system typography, and rounded surfaces. Utilities stay at the bottom of the portfolio. Preserve actual spreadsheet operations, keyboard support, privacy copy, and query/fragment-preserving redirects. No DNS changes are needed for this subpath.
 
 September 9, 2026: canonical deployment passed HTTPS and generated asset checks. Seven operation smoke checks passed, including generated XLSX read-back. Legacy Pages now publishes a browser redirect preserving query strings and fragments, with a visible no-JavaScript fallback link. No connected browser was available for rendered visual or interactive download QA.
+
+Task-first redesign: read MESSAGING.md before copy changes. Run `npm run lint` and `npm test` in frontend before syncing. Tests cover real spreadsheet operations and React interactions in jsdom, including tool selection, file limits, stale state, errors, and processing locks. Browser automation and rendered visual QA are omitted at the user’s request; responsive layouts are checked in source.
