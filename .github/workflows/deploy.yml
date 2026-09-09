@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Check tools and deploy legacy redirect
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: legacy
 
   deploy:
     needs: build
