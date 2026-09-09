@@ -85,41 +85,22 @@ const OPERATIONS = [
   },
 ]
 
-const COLOR_MAP = {
-  blue: 'bg-blue-50 border-blue-200 hover:border-blue-400 text-blue-600',
-  purple: 'bg-purple-50 border-purple-200 hover:border-purple-400 text-purple-600',
-  orange: 'bg-orange-50 border-orange-200 hover:border-orange-400 text-orange-600',
-  green: 'bg-green-50 border-green-200 hover:border-green-400 text-green-600',
-  yellow: 'bg-yellow-50 border-yellow-200 hover:border-yellow-400 text-yellow-600',
-  teal: 'bg-teal-50 border-teal-200 hover:border-teal-400 text-teal-600',
-  red: 'bg-red-50 border-red-200 hover:border-red-400 text-red-600',
-}
-
-const ACTIVE_COLOR_MAP = {
-  blue: 'bg-blue-100 border-blue-500 ring-2 ring-blue-200 text-blue-700',
-  purple: 'bg-purple-100 border-purple-500 ring-2 ring-purple-200 text-purple-700',
-  orange: 'bg-orange-100 border-orange-500 ring-2 ring-orange-200 text-orange-700',
-  green: 'bg-green-100 border-green-500 ring-2 ring-green-200 text-green-700',
-  yellow: 'bg-yellow-100 border-yellow-500 ring-2 ring-yellow-200 text-yellow-700',
-  teal: 'bg-teal-100 border-teal-500 ring-2 ring-teal-200 text-teal-700',
-  red: 'bg-red-100 border-red-500 ring-2 ring-red-200 text-red-700',
-}
-
 export default function OperationMenu({ selected, onSelect, fileCount }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       {OPERATIONS.map((op) => {
         const isActive = selected === op.id
         const isDisabled = fileCount < op.minFiles || (op.maxFiles && fileCount > op.maxFiles)
-        const colorClasses = isActive ? ACTIVE_COLOR_MAP[op.color] : COLOR_MAP[op.color]
+        const colorClasses = isActive ? 'tool-choice-active' : 'tool-choice'
 
         return (
           <button
             key={op.id}
+            aria-pressed={isActive}
             onClick={() => onSelect(isActive ? null : op.id)}
             disabled={isDisabled}
             className={`
-              border rounded-xl p-4 text-left transition-all
+              tool-choice border rounded-xl p-4 text-left transition-colors
               ${isDisabled
                 ? 'opacity-40 cursor-not-allowed bg-gray-50 border-gray-200'
                 : colorClasses + ' cursor-pointer'

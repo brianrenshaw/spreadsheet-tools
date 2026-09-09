@@ -1,0 +1,1 @@
+Spreadsheet Tools follows Folio: cream #faf8f5, warm surface #f0ebe4, ink #292522, muted #665b53, orange #9f4600. System typography, rounded workspace, clear three-step flow, accessible file selector, native form controls. Existing React operations are preserved. Public route: https://brianrenshaw.app/spreadsheet-tools/. Utilities remain last on the portfolio.

@@ -2,7 +2,7 @@ export default function ResultPanel({ result, operation }) {
   if (!result) return null
 
   return (
-    <div className="bg-green-50 border border-green-200 rounded-xl p-5 space-y-3">
+    <div role="status" className="bg-green-50 border border-green-200 rounded-xl p-5 space-y-3">
       <div className="flex items-center gap-2">
         <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

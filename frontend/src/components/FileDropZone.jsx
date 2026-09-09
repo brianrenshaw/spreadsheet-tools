@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { readColumns } from '../lib/spreadsheet'
 
 export default function FileDropZone({ files, setFiles }) {
@@ -6,7 +6,7 @@ export default function FileDropZone({ files, setFiles }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const handleDrop = useCallback(async (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault()
     setDragging(false)
     setError(null)
@@ -14,7 +14,7 @@ export default function FileDropZone({ files, setFiles }) {
     const droppedFiles = Array.from(e.dataTransfer.files)
     if (droppedFiles.length === 0) return
     await addFiles(droppedFiles)
-  }, [files])
+  }
 
   const handleFileInput = async (e) => {
     const selected = Array.from(e.target.files)
@@ -51,11 +51,15 @@ export default function FileDropZone({ files, setFiles }) {
   return (
     <div className="space-y-3">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Choose spreadsheet files"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('file-input').click() } }}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         className={`
-          border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer
+          file-drop border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer
           ${dragging
             ? 'border-blue-500 bg-blue-50'
             : 'border-gray-300 hover:border-gray-400 bg-gray-50'
@@ -93,7 +97,7 @@ export default function FileDropZone({ files, setFiles }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
           {error}
         </div>
       )}
@@ -112,6 +116,7 @@ export default function FileDropZone({ files, setFiles }) {
                 </div>
               </div>
               <button
+                aria-label={`Remove ${f.name}`}
                 onClick={() => removeFile(i)}
                 className="text-gray-400 hover:text-red-500 transition-colors ml-2"
               >

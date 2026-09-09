@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "project": {
+    "name": "spreadsheet-tools",
+    "productType": null,
+    "stack": []
+  },
+  "sources": {
+    "tokens": [],
+    "components": [],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "unknown",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    {
+      "id": "folio-inspired-tools",
+      "decision": "Warm cream, orange, and system typography from Folio; keep tools below apps on portfolio."
+    }
+  ],
+  "evidence": [],
+  "generatedAt": "2026-09-08T20:40:52.027Z"
+}

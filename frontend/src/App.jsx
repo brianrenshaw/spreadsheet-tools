@@ -33,25 +33,27 @@ function App() {
 
   return (
     <ErrorBoundary>
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="tools-app min-h-screen bg-gray-50">
+      <a className="skip-link" href="#workspace">Skip to tools</a><header className="tools-nav"><a href="https://brianrenshaw.app/">← Brian’s homepage</a><a href="https://github.com/brianrenshaw/spreadsheet-scripts">Get the scripts ↗</a></header><main className="tools-main">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Spreadsheet Tools</h1>
-          <p className="text-gray-600 text-sm mt-1">
-            Upload spreadsheet files and pick an operation. Supports CSV, XLSX, and XLS.
+        <div className="tools-intro">
+          <p className="tools-eyebrow">SPREADSHEET TOOLS · BY BRIAN RENSHAW</p><h1>A little less<br />spreadsheet busywork.</h1>
+          <p className="tools-lead">
+            Merge, tidy, compare, and convert. Small tools for getting your files into shape.
           </p>
-          <div className="flex items-center gap-1.5 mt-2">
+          <div className="privacy-note">
             <svg className="h-4 w-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            <p className="text-xs text-green-700">
-              Your files stay on your computer. Everything is processed right here in your browser — nothing is uploaded to a server.
+            <p className="text-sm">
+              Your files stay yours. All processing happens in your browser. No accounts or uploads.
             </p>
           </div>
 
           {/* Guide toggle */}
           <button
+            aria-expanded={showGuide}
+            aria-controls="tool-guide"
             onClick={() => setShowGuide(!showGuide)}
             className="mt-3 text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
           >
@@ -62,7 +64,7 @@ function App() {
           </button>
 
           {showGuide && (
-            <div className="mt-3 bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+            <div id="tool-guide" className="mt-3 bg-white border border-gray-200 rounded-xl p-5 space-y-3">
               {TOOL_DESCRIPTIONS.map((tool) => (
                 <div key={tool.name}>
                   <p className="text-sm font-semibold text-gray-900">{tool.name}</p>
@@ -73,17 +75,17 @@ function App() {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="workspace space-y-6" id="workspace" tabIndex={-1}>
           {/* Step 1: Upload files */}
           <section>
-            <StepHeader number="1" title="Upload Files" />
-            <FileDropZone files={files} setFiles={setFiles} />
+            <StepHeader number="1" title="Choose your files" />
+            <FileDropZone files={files} setFiles={(next) => { setFiles(next); setSelectedOp(null); setResult(null) }} />
           </section>
 
           {/* Step 2: Choose operation */}
           {files.length > 0 && (
             <section>
-              <StepHeader number="2" title="Choose Operation" />
+              <StepHeader number="2" title="Choose a tool" />
               <OperationMenu
                 selected={selectedOp}
                 onSelect={(op) => { setSelectedOp(op); setResult(null) }}
@@ -95,8 +97,9 @@ function App() {
           {/* Step 3: Configure & run */}
           {selectedOp && (
             <section>
-              <StepHeader number="3" title="Configure & Run" />
+              <StepHeader number="3" title="Make it yours" />
               <OperationForm
+                key={selectedOp}
                 operation={selectedOp}
                 files={files}
                 onResult={handleResult}
@@ -124,16 +127,8 @@ function App() {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-400">
-            Built by Brian Renshaw with{' '}
-            <a href="https://claude.ai/claude-code" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 underline">
-              Claude Code
-            </a>
-          </p>
-        </div>
-      </div>
+        <footer className="tools-footer"><span>Spreadsheet Tools · Brian Renshaw</span><a href="mailto:contact@brianrenshaw.app">Contact</a><a href="https://github.com/brianrenshaw/spreadsheet-tools">Source on GitHub ↗</a></footer>
+      </main>
     </div>
     </ErrorBoundary>
   )
